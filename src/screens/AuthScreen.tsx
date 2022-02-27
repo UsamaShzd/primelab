@@ -5,7 +5,7 @@ import {
   KeyboardAvoidingView,
   StyleSheet,
   Modal,
-  StatusBar,
+  FlatList,
 } from 'react-native';
 import {widthPercentageToDP as wp} from 'react-native-responsive-screen';
 import colors from '../constants/colors';
@@ -17,26 +17,25 @@ import * as Yup from 'yup';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, RootState} from '../store/store';
 import loadUsers from '../store/thunks/loadUsers';
+import User from '../interfaces/User';
 
 const AuthScreen: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const users = useSelector<RootState>(state => state.users.list);
+  const users = useSelector<RootState>(state => state.users);
 
   const [signupMethod, setSignupMethod] = useState<string>('Email');
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [showUsersList, setShowUsersList] = useState<boolean>(false);
 
   const isEmailMethod = signupMethod === 'Email';
 
-  useEffect(() => {
-    dispatch(loadUsers());
-  }, []);
-
-  useEffect(() => {
-    console.log('Users => ', (users as []).length);
-  }, [users]);
-
   const onSignupFormSubmit = () => {
     setIsModalOpen(true);
+  };
+
+  const onNameFormSubmit = () => {
+    setShowUsersList(true);
+    dispatch(loadUsers());
   };
 
   const renderEmailSignupForm = (
@@ -66,6 +65,15 @@ const AuthScreen: React.FC = () => {
     </Formik>
   );
 
+  const userList = (
+    <FlatList
+      data={users.list as User[]}
+      renderItem={({item}) => {
+        return <Text>{item.name}</Text>;
+      }}
+    />
+  );
+
   const renderNameModal = (
     <Modal
       animationType="slide"
@@ -74,31 +82,40 @@ const AuthScreen: React.FC = () => {
       onRequestClose={() => setIsModalOpen(false)}>
       <View style={styles.modalWrapper}>
         <View style={styles.modalContent}>
-          <Formik
-            initialValues={{fullName: '', walletId: ''}}
-            validationSchema={Yup.object().shape({
-              fullName: Yup.string().required('Required'),
-              walletId: Yup.string().required('Required'),
-            })}
-            onSubmit={onSignupFormSubmit}>
+          {showUsersList ? (
+            userList
+          ) : (
             <>
-              <Input name={'fullName'} label={'Full Name'} />
-              <Input name={'walletId'} label={'Wallet ID'} />
-              <SubmitButton>Create Account</SubmitButton>
+              <Formik
+                initialValues={{fullName: '', walletId: ''}}
+                validationSchema={Yup.object().shape({
+                  fullName: Yup.string().required('Required'),
+                  walletId: Yup.string().required('Required'),
+                })}
+                onSubmit={onNameFormSubmit}>
+                <>
+                  <Input name={'fullName'} label={'Full Name'} />
+                  <Input name={'walletId'} label={'Wallet ID'} />
+                  <SubmitButton>Create Account</SubmitButton>
+                </>
+              </Formik>
+
+              <View>
+                <Text style={styles.signinText}>
+                  Already Have Near Account?
+                </Text>
+
+                <Button mode="contained" onPress={() => setIsModalOpen(false)}>
+                  Login With Near
+                </Button>
+              </View>
             </>
-          </Formik>
-
-          <View>
-            <Text style={styles.signinText}>Already Have Near Account?</Text>
-
-            <Button mode="contained" onPress={() => setIsModalOpen(false)}>
-              Login With Near
-            </Button>
-          </View>
+          )}
         </View>
       </View>
     </Modal>
   );
+
   return (
     <KeyboardAvoidingView style={{flex: 1}} behavior="padding">
       <View style={styles.screenContainer}>
