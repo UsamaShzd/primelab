@@ -9,15 +9,15 @@ interface User {
     city: string;
     zipcode: string;
     geo: {
-      lat: number;
-      lng: number;
+      lat: string;
+      lng: string;
     };
   };
   phone: string;
   website: string;
   company: {
     name: string;
-    carchPhrase: string;
+    catchPhrase: string;
     bs: string;
   };
 }

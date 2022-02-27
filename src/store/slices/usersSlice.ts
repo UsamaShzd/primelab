@@ -1,13 +1,17 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import User from '../../interfaces/User';
-const initialState: User[] = [];
+const initialState: {
+  list: User[];
+} = {
+  list: [],
+};
 
 const usersSlice = createSlice({
   name: 'users',
   initialState,
   reducers: {
     setUsers: (state, action: PayloadAction<User[]>) => {
-      state = action.payload;
+      state.list = action.payload;
     },
   },
 });
