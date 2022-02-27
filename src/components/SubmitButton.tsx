@@ -6,7 +6,6 @@ import {useFormikContext} from 'formik';
 const SubmitButton: React.FC = ({children}) => {
   const {isSubmitting, submitForm, errors} = useFormikContext();
   const hasErrors = Object.keys(errors).length > 0;
-  console.log(errors);
   return (
     <Button
       mode="contained"
