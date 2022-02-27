@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {View, SafeAreaView, StyleSheet} from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -10,9 +10,16 @@ import Input from '../components/Input';
 import SubmitButton from '../components/SubmitButton';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
+import {useSelector} from 'react-redux';
+import {RootState} from '../store/store';
 
 const AuthScreen: React.FC = () => {
   const [signupMethod, setSignupMethod] = useState<string>('Email');
+  const users = useSelector<RootState>(state => state.users);
+
+  useEffect(() => {
+    console.log('USERS => ', users);
+  }, []);
 
   const isEmailMethod = signupMethod === 'Email';
   const renderEmailSignupForm = (
