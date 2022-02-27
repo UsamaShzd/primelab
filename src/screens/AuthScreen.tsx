@@ -10,11 +10,25 @@ import Input from '../components/Input';
 import SubmitButton from '../components/SubmitButton';
 import {Formik} from 'formik';
 import * as Yup from 'yup';
+import {useDispatch, useSelector} from 'react-redux';
+import {AppDispatch, RootState} from '../store/store';
+import loadUsers from '../store/thunks/loadUsers';
 
 const AuthScreen: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const users = useSelector<RootState>(state => state.users.list);
   const [signupMethod, setSignupMethod] = useState<string>('Email');
 
   const isEmailMethod = signupMethod === 'Email';
+
+  useEffect(() => {
+    dispatch(loadUsers());
+  }, []);
+
+  useEffect(() => {
+    console.log('Users => ', (users as []).length);
+  }, [users]);
+
   const renderEmailSignupForm = (
     <Formik
       initialValues={{email: ''}}
